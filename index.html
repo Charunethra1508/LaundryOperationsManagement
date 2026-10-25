@@ -3,200 +3,801 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laundry Operations Management</title>
+<title>LaundryPro | Admin Dashboard</title>
 
 <style>
-* { box-sizing: border-box; }
-
+:root {
+  --navy:#111a35;
+  --blue:#4b67f5;
+  --purple:#8057e9;
+  --bg:#f4f6fc;
+  --muted:#8590a8;
+  --border:#e8ecf5;
+  --green:#13845c;
+  --orange:#b87912;
+}
+* { box-sizing:border-box; }
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f1f5f9;
-  color: #172554;
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  color:var(--navy);
+  background:var(--bg);
 }
-
-header {
-  background: #0f172a;
-  color: white;
-  padding: 25px;
-  text-align: center;
+button,input,select { font:inherit; }
+button { cursor:pointer; transition:.2s; }
+button:hover { filter:brightness(.97); }
+button:focus-visible,input:focus-visible,select:focus-visible {
+  outline:2px solid var(--blue);
+  outline-offset:2px;
 }
-
-header p { color: #cbd5e1; }
-
-main {
-  max-width: 900px;
-  margin: 30px auto;
-  padding: 20px;
+.layout {
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:235px minmax(0,1fr);
 }
-
+.sidebar {
+  background:var(--navy);
+  color:white;
+  padding:25px 17px;
+}
+.brand {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-size:21px;
+  font-weight:800;
+  margin:3px 5px 40px;
+}
+.brand-icon {
+  padding:10px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#6d8aff,#a277ff);
+}
+.nav-label {
+  margin:25px 10px 12px;
+  font-size:10px;
+  letter-spacing:2px;
+  color:#8995b3;
+}
+.nav-item {
+  display:block;
+  width:100%;
+  padding:13px 12px;
+  margin-bottom:7px;
+  border:0;
+  border-radius:10px;
+  text-align:left;
+  color:#c2cbe0;
+  background:transparent;
+  font-size:14px;
+}
+.nav-item.active {
+  color:white;
+  background:linear-gradient(100deg,var(--blue),var(--purple));
+}
+.sidebar-note {
+  margin-top:35px;
+  padding:15px;
+  border-radius:13px;
+  background:#202b49;
+  color:#cbd4ee;
+  font-size:12px;
+  line-height:1.7;
+}
+.main { min-width:0; padding:27px 30px; }
+.topbar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:25px;
+}
+.eyebrow {
+  font-size:11px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+h1 { margin:7px 0; font-size:30px; }
+.subtitle { font-size:13px; color:var(--muted); line-height:1.6; }
+.admin-pill {
+  padding:11px 14px;
+  border-radius:25px;
+  background:white;
+  border:1px solid var(--border);
+  font-size:12px;
+  white-space:nowrap;
+}
+.hero {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:27px;
+  border-radius:20px;
+  color:white;
+  background:linear-gradient(115deg,#4568f5,#7958e9 70%,#a16df6);
+  animation:appear .4s ease;
+}
+.hero h2 { margin:0 0 10px; font-size:24px; }
+.hero p { margin:0; color:#e6eaff; font-size:13px; line-height:1.8; }
+.hero-icon { font-size:57px; }
 .stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px;
-  margin-bottom: 25px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  margin:22px 0;
 }
-
-.card {
-  background: white;
-  padding: 22px;
-  border-radius: 14px;
-  box-shadow: 0 4px 15px #00000010;
+.stat,.panel {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 5px 20px #17213b06;
 }
-
-.stats h2 { color: #0284c7; }
-
-form { display: grid; gap: 14px; }
-
-input, select, button {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 16px;
+.stat {
+  padding:17px;
+  cursor:pointer;
+  animation:appear .45s ease;
 }
-
-button {
-  background: #0284c7;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
+.stat:hover,.stat.selected { border-color:#9aa9ff; }
+.stat-top { display:flex; justify-content:space-between; gap:6px; }
+.stat-label { font-size:12px; color:var(--muted); }
+.stat-icon {
+  display:grid;
+  place-items:center;
+  width:35px;
+  height:35px;
+  background:#eff1ff;
+  border-radius:11px;
 }
-
-button:hover { background: #0369a1; }
-
-.order {
-  border-bottom: 1px solid #e2e8f0;
-  padding: 14px 0;
-  overflow-wrap: anywhere;
+.stat h3 { margin:15px 0 5px; font-size:28px; }
+.stat small { color:var(--muted); font-size:11px; }
+.content-grid {
+  display:grid;
+  grid-template-columns:minmax(250px,.8fr) minmax(0,1.6fr);
+  align-items:start;
+  gap:18px;
 }
-
-.status { color: #047857; font-weight: bold; }
-
-footer {
-  text-align: center;
-  padding: 20px;
-  color: #64748b;
+.panel { min-width:0; padding:20px; }
+.panel-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:19px;
+}
+.panel-heading h2 { margin:0; font-size:17px; }
+.panel-heading p { margin:6px 0 0; color:var(--muted); font-size:12px; }
+.field { margin-bottom:15px; }
+.field label {
+  display:block;
+  margin-bottom:7px;
+  font-size:12px;
+  font-weight:bold;
+}
+.field input,.field select,.toolbar input,.toolbar select {
+  width:100%;
+  min-width:0;
+  padding:12px;
+  border:1px solid #e1e7f1;
+  border-radius:9px;
+  background:#fbfcff;
+  color:var(--navy);
+}
+.primary {
+  border:0;
+  border-radius:9px;
+  padding:13px 16px;
+  color:white;
+  font-weight:bold;
+  background:linear-gradient(100deg,var(--blue),var(--purple));
+}
+.full { width:100%; }
+.secondary {
+  padding:9px 12px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:white;
+  color:var(--navy);
+  font-size:12px;
+}
+.toolbar {
+  display:grid;
+  grid-template-columns:minmax(100px,1fr) 140px;
+  gap:9px;
+  margin-bottom:15px;
+}
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; text-align:left; }
+th {
+  padding:12px 9px;
+  border-bottom:1px solid var(--border);
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+}
+td {
+  padding:13px 9px;
+  border-bottom:1px solid #f0f2f8;
+  vertical-align:middle;
+  font-size:12px;
+}
+.customer-name { font-size:12px; font-weight:bold; overflow-wrap:anywhere; }
+.subtext { margin-top:5px; color:var(--muted); font-size:11px; }
+.badge {
+  display:inline-block;
+  padding:6px 8px;
+  border-radius:20px;
+  font-size:10px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+.pending { background:#fff2d9; color:#a66c0c; }
+.in-progress { background:#e8edff; color:#405bd2; }
+.completed { background:#ddf7e9; color:#13845c; }
+.status-select {
+  max-width:135px;
+  width:100%;
+  padding:7px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  background:white;
+  font-size:11px;
+}
+.delete-btn {
+  border:0;
+  border-radius:7px;
+  padding:8px 10px;
+  color:#cb4051;
+  background:#fff0f1;
+  margin-top:5px;
+}
+.empty {
+  padding:30px 10px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.8;
+}
+.page { display:none; animation:appear .3s ease; }
+.page.active { display:block; }
+.info-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+  margin-bottom:20px;
+}
+.info-card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:20px;
+}
+.info-card p { color:var(--muted); font-size:12px; }
+.info-card h3 { font-size:25px; margin:8px 0; }
+.customer-card {
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:10px;
+  background:#fff;
+  overflow-wrap:anywhere;
+}
+.customer-card h3 { font-size:14px; margin:0 0 8px; }
+.customer-card p { font-size:12px; color:var(--muted); margin:5px 0; }
+.progress-track {
+  height:8px;
+  overflow:hidden;
+  border-radius:20px;
+  background:#edf0f8;
+  margin:10px 0 18px;
+}
+.progress-bar {
+  height:100%;
+  border-radius:20px;
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  transition:width .3s;
+}
+.footer { padding:25px 0 5px; text-align:center; color:var(--muted); font-size:11px; }
+.toast {
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  max-width:calc(100vw - 40px);
+  padding:14px 18px;
+  border-radius:11px;
+  color:white;
+  background:#15213e;
+  box-shadow:0 8px 25px #0002;
+  opacity:0;
+  transform:translateY(10px);
+  pointer-events:none;
+  transition:.25s;
+  z-index:10;
+}
+.toast.show { opacity:1; transform:translateY(0); }
+@keyframes appear {
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@media(max-width:1050px) {
+  .stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .content-grid { grid-template-columns:1fr; }
+}
+@media(max-width:650px) {
+  .layout { grid-template-columns:1fr; }
+  .sidebar { padding:15px; }
+  .brand { margin:0 5px 15px; }
+  .nav-label,.sidebar-note { display:none; }
+  .nav-item { display:inline-block; width:auto; margin:0 3px 5px 0; padding:10px; font-size:12px; }
+  .main { padding:18px 12px; }
+  h1 { font-size:25px; }
+  .admin-pill { font-size:10px; padding:9px; }
+  .hero { padding:20px; }
+  .hero h2 { font-size:19px; }
+  .hero-icon { font-size:40px; }
+  .stat { padding:13px; }
+  .stat h3 { font-size:25px; }
+  .panel { padding:14px; }
+  .toolbar { grid-template-columns:1fr; }
+  .info-grid { grid-template-columns:1fr; }
 }
 </style>
 </head>
 
 <body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-icon">🧺</span> LaundryPro</div>
 
-<header>
-  <h1>🧺 Laundry Operations</h1>
-  <p>Customer Management • Order Processing • Service Tracking</p>
-</header>
+    <div class="nav-label">WORKSPACE</div>
+    <button class="nav-item active" data-view="dashboard">▦ &nbsp; Dashboard</button>
+    <button class="nav-item" data-view="orders">▤ &nbsp; Order Management</button>
+    <button class="nav-item" data-view="customers">♙ &nbsp; Customers</button>
 
-<main>
-  <div class="stats">
-    <div class="card">
-      <p>Total Orders</p>
-      <h2 id="total">0</h2>
+    <div class="nav-label">SYSTEM</div>
+    <button class="nav-item" data-view="operations">⚙ &nbsp; Operations</button>
+
+    <div class="sidebar-note">
+      <strong>✨ Smarter laundry operations</strong><br>
+      Manage customer orders and monitor service progress in one place.
     </div>
-    <div class="card">
-      <p>Pending Orders</p>
-      <h2 id="pending">0</h2>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="eyebrow">Laundry Operations / Overview</div>
+        <h1 id="pageTitle">Admin Dashboard</h1>
+        <div class="subtitle" id="pageSubtitle">Welcome back! Here's your business overview.</div>
+      </div>
+      <div class="admin-pill">🟢 &nbsp; Admin Panel</div>
     </div>
-    <div class="card">
-      <p>Completed Orders</p>
-      <h2 id="completed">0</h2>
-    </div>
-  </div>
 
-  <section class="card">
-    <h2>Create Laundry Order</h2>
-    <form id="orderForm">
-      <input id="customer" placeholder="Customer name" required>
-      <input id="address" placeholder="Customer address" required>
+    <!-- DASHBOARD -->
+    <section class="page active" id="dashboardPage">
+      <div class="hero">
+        <div>
+          <h2>Fresh clothes, smarter operations.</h2>
+          <p>Organise orders, monitor service progress<br>and keep your laundry business running smoothly.</p>
+        </div>
+        <div class="hero-icon">🫧</div>
+      </div>
 
-      <select id="service">
-        <option>Normal Laundry</option>
-        <option>Dry Cleaning</option>
-      </select>
+      <div class="stats">
+        <div class="stat" data-status="All" tabindex="0" role="button" aria-label="View all orders">
+          <div class="stat-top"><span class="stat-label">Total Orders</span><span class="stat-icon">📦</span></div>
+          <h3 id="total">0</h3><small>View all orders →</small>
+        </div>
+        <div class="stat" data-status="Pending" tabindex="0" role="button" aria-label="View pending orders">
+          <div class="stat-top"><span class="stat-label">Pending</span><span class="stat-icon">⏳</span></div>
+          <h3 id="pending">0</h3><small>Awaiting processing →</small>
+        </div>
+        <div class="stat" data-status="In Progress" tabindex="0" role="button" aria-label="View orders in progress">
+          <div class="stat-top"><span class="stat-label">In Progress</span><span class="stat-icon">🌀</span></div>
+          <h3 id="progress">0</h3><small>Currently being handled →</small>
+        </div>
+        <div class="stat" data-status="Completed" tabindex="0" role="button" aria-label="View completed orders">
+          <div class="stat-top"><span class="stat-label">Completed</span><span class="stat-icon">✨</span></div>
+          <h3 id="completed">0</h3><small>Successfully completed →</small>
+        </div>
+      </div>
 
-      <input id="items" type="number" min="1"
-             placeholder="Number of items" required>
+      <div class="content-grid">
+        <section class="panel" id="createPanel">
+          <div class="panel-heading">
+            <div><h2>＋ Create New Order</h2><p>Enter customer and service details</p></div>
+          </div>
+          <form id="orderForm">
+            <div class="field">
+              <label for="customer">Customer Name</label>
+              <input id="customer" maxlength="100" placeholder="e.g. Priya Kumar" required>
+            </div>
+            <div class="field">
+              <label for="address">Delivery Address</label>
+              <input id="address" maxlength="200" placeholder="Enter customer address" required>
+            </div>
+            <div class="field">
+              <label for="service">Laundry Service</label>
+              <select id="service">
+                <option>Normal Laundry</option>
+                <option>Dry Cleaning</option>
+                <option>Express Laundry</option>
+                <option>Ironing Only</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="items">Number of Items</label>
+              <input id="items" type="number" min="1" max="10000" placeholder="e.g. 5" required>
+            </div>
+            <button class="primary full" type="submit">＋ &nbsp; Create Order</button>
+          </form>
+        </section>
 
-      <button type="submit">Create Order</button>
-    </form>
-  </section>
+        <section class="panel" id="dashboardOrders">
+          <div class="panel-heading">
+            <div><h2>Recent Orders</h2><p>Your latest laundry orders</p></div>
+            <button type="button" class="secondary" id="viewAllBtn">View all</button>
+          </div>
+          <div id="recentOrders"></div>
+        </section>
+      </div>
+    </section>
 
-  <section class="card" style="margin-top:25px">
-    <h2>Order Tracking</h2>
-    <div id="orders">No orders created yet.</div>
-  </section>
-</main>
+    <!-- ORDER MANAGEMENT -->
+    <section class="page" id="ordersPage">
+      <section class="panel">
+        <div class="panel-heading">
+          <div><h2>Order Management</h2><p>Search, filter and update orders</p></div>
+          <button type="button" class="primary" id="newOrderBtn">＋ New Order</button>
+        </div>
+        <div class="toolbar">
+          <input id="search" type="search" placeholder="🔎 Search customer or order ID">
+          <select id="filter" aria-label="Filter orders">
+            <option value="All">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order / Customer</th><th>Service</th><th>Status</th><th>Manage</th></tr></thead>
+            <tbody id="ordersTable"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="ordersEmpty">🧺<br>No orders found.</div>
+      </section>
+    </section>
 
-<footer>
-  Laundry Operations Management System | Project Demo
-</footer>
+    <!-- CUSTOMERS -->
+    <section class="page" id="customersPage">
+      <section class="panel">
+        <div class="panel-heading">
+          <div><h2>Customer Directory</h2><p>Customers are collected automatically from orders</p></div>
+        </div>
+        <div class="toolbar">
+          <input id="customerSearch" type="search" placeholder="🔎 Search customers">
+          <button type="button" class="secondary" id="clearCustomerSearch">Clear search</button>
+        </div>
+        <div id="customerList"></div>
+        <div id="customersEmpty" class="empty">👥<br>No customers yet. Create an order to add a customer.</div>
+      </section>
+    </section>
+
+    <!-- OPERATIONS -->
+    <section class="page" id="operationsPage">
+      <div class="info-grid">
+        <div class="info-card"><p>Total orders</p><h3 id="opsTotal">0</h3><span class="subtext">All registered orders</span></div>
+        <div class="info-card"><p>Active orders</p><h3 id="opsActive">0</h3><span class="subtext">Pending + In Progress</span></div>
+        <div class="info-card"><p>Completion rate</p><h3 id="opsRate">0%</h3><span class="subtext">Completed orders / total</span></div>
+      </div>
+      <section class="panel">
+        <div class="panel-heading"><div><h2>Operations Overview</h2><p>Live status breakdown</p></div></div>
+        <p>Pending orders <strong id="opsPendingText">0</strong></p>
+        <div class="progress-track"><div class="progress-bar" id="pendingBar" style="width:0%"></div></div>
+        <p>Orders in progress <strong id="opsProgressText">0</strong></p>
+        <div class="progress-track"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+        <p>Completed orders <strong id="opsCompletedText">0</strong></p>
+        <div class="progress-track"><div class="progress-bar" id="completedBar" style="width:0%"></div></div>
+        <button type="button" class="primary" id="operationsOrdersBtn">Manage Orders →</button>
+      </section>
+    </section>
+
+    <footer class="footer">LaundryPro Operations Dashboard · Student Project Demo</footer>
+  </main>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
+const $ = id => document.getElementById(id);
 let orders = [];
+let nextId = 1001;
+let toastTimer;
 
-document.getElementById("orderForm").addEventListener("submit", function(event) {
-  event.preventDefault();
+function showToast(message) {
+  $("toast").textContent = message;
+  $("toast").classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $("toast").classList.remove("show"), 2500);
+}
 
-  const order = {
-    id: Date.now().toString().slice(-6),
-    customer: document.getElementById("customer").value.trim(),
-    address: document.getElementById("address").value.trim(),
-    service: document.getElementById("service").value,
-    items: Number(document.getElementById("items").value),
-    status: "Pending"
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+
+function statusClass(status) {
+  return status.toLowerCase().replace(" ", "-");
+}
+
+function showPage(view) {
+  const views = {
+    dashboard: ["dashboardPage", "Admin Dashboard", "Welcome back! Here's your business overview."],
+    orders: ["ordersPage", "Order Management", "Search, filter and manage every order."],
+    customers: ["customersPage", "Customers", "View customers recorded through their orders."],
+    operations: ["operationsPage", "Operations", "Monitor the progress of your laundry business."]
   };
 
-  orders.push(order);
-  renderOrders();
-  this.reset();
+  if (!views[view]) return;
+
+  document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+  $(views[view][0]).classList.add("active");
+  $("pageTitle").textContent = views[view][1];
+  $("pageSubtitle").textContent = views[view][2];
+
+  document.querySelectorAll(".nav-item[data-view]").forEach(button => {
+    button.classList.toggle("active", button.dataset.view === view);
+  });
+
+  if (view === "orders") renderOrdersTable();
+  if (view === "customers") renderCustomers();
+  if (view === "operations") renderOperations();
+
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+document.querySelectorAll(".nav-item[data-view]").forEach(button => {
+  button.addEventListener("click", () => showPage(button.dataset.view));
 });
 
-function renderOrders() {
-  document.getElementById("total").textContent = orders.length;
-  document.getElementById("pending").textContent =
-    orders.filter(o => o.status === "Pending").length;
-  document.getElementById("completed").textContent =
-    orders.filter(o => o.status === "Completed").length;
+$("orderForm").addEventListener("submit", event => {
+  event.preventDefault();
 
-  const container = document.getElementById("orders");
-  container.replaceChildren();
+  const customer = $("customer").value.trim();
+  const address = $("address").value.trim();
+  const items = Number($("items").value);
 
-  if (orders.length === 0) {
-    container.textContent = "No orders created yet.";
+  if (!customer || !address || !Number.isInteger(items) || items < 1) {
+    showToast("Please enter valid order details.");
     return;
   }
 
-  orders.slice().reverse().forEach(order => {
-    const item = document.createElement("div");
-    item.className = "order";
+  orders.push({
+    id: nextId++,
+    customer,
+    address,
+    service: $("service").value,
+    items,
+    status: "Pending",
+    createdAt: new Date().toLocaleDateString()
+  });
 
-    const details = document.createElement("p");
-    details.textContent = `Order #${order.id} | ${order.customer} | ${order.service} | ${order.items} items`;
+  event.target.reset();
+  renderAll();
+  showToast("Order created successfully!");
+});
 
-    const address = document.createElement("p");
-    address.textContent = `Address: ${order.address}`;
+function updateStatus(id, status) {
+  const order = orders.find(o => o.id === id);
+  if (!order) return;
 
-    const status = document.createElement("p");
-    status.className = "status";
-    status.textContent = `Status: ${order.status}`;
+  order.status = status;
+  renderAll();
+  showToast("Order #" + id + " updated to " + status + ".");
+}
 
-    const button = document.createElement("button");
-    button.textContent = "Mark as Completed";
-    button.type = "button";
-    button.addEventListener("click", () => {
-      order.status = "Completed";
-      renderOrders();
+function deleteOrder(id) {
+  const order = orders.find(o => o.id === id);
+  if (!order) return;
+
+  if (!confirm("Delete order #" + id + " for " + order.customer + "?")) return;
+
+  orders = orders.filter(o => o.id !== id);
+  renderAll();
+  showToast("Order deleted.");
+}
+
+function orderRow(o) {
+  return `<tr>
+    <td>
+      <div class="customer-name">${escapeHTML(o.customer)}</div>
+      <div class="subtext">#${o.id} · ${o.items} items</div>
+      <div class="subtext">${escapeHTML(o.createdAt)}</div>
+    </td>
+    <td>${escapeHTML(o.service)}</td>
+    <td><span class="badge ${statusClass(o.status)}">${escapeHTML(o.status)}</span></td>
+    <td>
+      <select class="status-select" aria-label="Change order ${o.id} status"
+        data-status-id="${o.id}">
+        ${["Pending","In Progress","Completed"].map(s =>
+          `<option value="${s}" ${o.status === s ? "selected" : ""}>${s}</option>`
+        ).join("")}
+      </select>
+      <button type="button" class="delete-btn" data-delete-id="${o.id}"
+        aria-label="Delete order ${o.id}">✕ Delete</button>
+    </td>
+  </tr>`;
+}
+
+function attachOrderActions(container) {
+  container.querySelectorAll("[data-status-id]").forEach(select => {
+    select.addEventListener("change", () => {
+      updateStatus(Number(select.dataset.statusId), select.value);
     });
+  });
 
-    item.append(details, address, status, button);
-    container.appendChild(item);
+  container.querySelectorAll("[data-delete-id]").forEach(button => {
+    button.addEventListener("click", () => {
+      deleteOrder(Number(button.dataset.deleteId));
+    });
   });
 }
 
-renderOrders();
-</script>
+function renderOrdersTable() {
+  const query = $("search").value.trim().toLowerCase();
+  const filter = $("filter").value;
 
+  const filtered = orders.filter(o =>
+    (o.customer.toLowerCase().includes(query) || String(o.id).includes(query)) &&
+    (filter === "All" || o.status === filter)
+  ).slice().reverse();
+
+  $("ordersTable").innerHTML = filtered.map(orderRow).join("");
+  $("ordersEmpty").style.display = filtered.length ? "none" : "block";
+  attachOrderActions($("ordersTable"));
+}
+
+function renderRecentOrders() {
+  const recent = orders.slice(-5).reverse();
+  const container = $("recentOrders");
+
+  if (!recent.length) {
+    container.innerHTML = '<div class="empty">🧺<br>No orders yet.<br>Create your first order using the form.</div>';
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="table-wrap"><table>
+      <thead><tr><th>Customer</th><th>Status</th><th>Update</th></tr></thead>
+      <tbody>${recent.map(o => orderRow(o)).join("")}</tbody>
+    </table></div>`;
+  attachOrderActions(container);
+}
+
+function renderCustomers() {
+  const query = $("customerSearch").value.trim().toLowerCase();
+  const unique = new Map();
+
+  orders.forEach(o => {
+    const key = o.customer.trim().toLowerCase();
+    if (!unique.has(key)) {
+      unique.set(key, {name:o.customer, address:o.address, orders:[]});
+    }
+    unique.get(key).orders.push(o);
+  });
+
+  const customers = [...unique.values()].filter(c =>
+    c.name.toLowerCase().includes(query) || c.address.toLowerCase().includes(query)
+  );
+
+  $("customerList").innerHTML = customers.map(c => `
+    <div class="customer-card">
+      <h3>👤 ${escapeHTML(c.name)}</h3>
+      <p>📍 ${escapeHTML(c.address)}</p>
+      <p>📦 Total orders: <strong>${c.orders.length}</strong></p>
+      <p>⏳ Pending: ${c.orders.filter(o=>o.status==="Pending").length}
+         · 🌀 In progress: ${c.orders.filter(o=>o.status==="In Progress").length}
+         · ✅ Completed: ${c.orders.filter(o=>o.status==="Completed").length}</p>
+      <button type="button" class="secondary" data-customer-orders="${escapeHTML(c.name)}">
+        View orders
+      </button>
+    </div>
+  `).join("");
+
+  $("customersEmpty").style.display = customers.length ? "none" : "block";
+
+  $("customerList").querySelectorAll("[data-customer-orders]").forEach(button => {
+    button.addEventListener("click", () => {
+      $("search").value = button.dataset.customerOrders;
+      $("filter").value = "All";
+      showPage("orders");
+      renderOrdersTable();
+    });
+  });
+}
+
+function renderOperations() {
+  const total = orders.length;
+  const pending = orders.filter(o => o.status === "Pending").length;
+  const progress = orders.filter(o => o.status === "In Progress").length;
+  const completed = orders.filter(o => o.status === "Completed").length;
+
+  $("opsTotal").textContent = total;
+  $("opsActive").textContent = pending + progress;
+  $("opsRate").textContent = (total ? Math.round(completed / total * 100) : 0) + "%";
+  $("opsPendingText").textContent = pending;
+  $("opsProgressText").textContent = progress;
+  $("opsCompletedText").textContent = completed;
+
+  $("pendingBar").style.width = (total ? pending / total * 100 : 0) + "%";
+  $("progressBar").style.width = (total ? progress / total * 100 : 0) + "%";
+  $("completedBar").style.width = (total ? completed / total * 100 : 0) + "%";
+}
+
+function renderAll() {
+  const count = status => orders.filter(o => o.status === status).length;
+
+  $("total").textContent = orders.length;
+  $("pending").textContent = count("Pending");
+  $("progress").textContent = count("In Progress");
+  $("completed").textContent = count("Completed");
+
+  renderRecentOrders();
+  renderOrdersTable();
+  renderCustomers();
+  renderOperations();
+}
+
+document.querySelectorAll(".stat[data-status]").forEach(card => {
+  function activate() {
+    $("search").value = "";
+    $("filter").value = card.dataset.status;
+    showPage("orders");
+    renderOrdersTable();
+  }
+
+  card.addEventListener("click", activate);
+  card.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      activate();
+    }
+  });
+});
+
+$("viewAllBtn").addEventListener("click", () => {
+  $("search").value = "";
+  $("filter").value = "All";
+  showPage("orders");
+});
+
+$("newOrderBtn").addEventListener("click", () => {
+  showPage("dashboard");
+  $("createPanel").scrollIntoView({behavior:"smooth", block:"start"});
+  $("customer").focus({preventScroll:true});
+});
+
+$("operationsOrdersBtn").addEventListener("click", () => {
+  $("search").value = "";
+  $("filter").value = "All";
+  showPage("orders");
+});
+
+$("search").addEventListener("input", renderOrdersTable);
+$("filter").addEventListener("change", renderOrdersTable);
+$("customerSearch").addEventListener("input", renderCustomers);
+
+$("clearCustomerSearch").addEventListener("click", () => {
+  $("customerSearch").value = "";
+  renderCustomers();
+  $("customerSearch").focus();
+});
+
+renderAll();
+</script>
 </body>
 </html>
