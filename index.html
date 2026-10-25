@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laundry Operations Management</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  color: #172554;
+}
+
+header {
+  background: #0f172a;
+  color: white;
+  padding: 25px;
+  text-align: center;
+}
+
+header p { color: #cbd5e1; }
+
+main {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: white;
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px #00000010;
+}
+
+.stats h2 { color: #0284c7; }
+
+form { display: grid; gap: 14px; }
+
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+button {
+  background: #0284c7;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover { background: #0369a1; }
+
+.order {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 0;
+  overflow-wrap: anywhere;
+}
+
+.status { color: #047857; font-weight: bold; }
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🧺 Laundry Operations</h1>
+  <p>Customer Management • Order Processing • Service Tracking</p>
+</header>
+
+<main>
+  <div class="stats">
+    <div class="card">
+      <p>Total Orders</p>
+      <h2 id="total">0</h2>
+    </div>
+    <div class="card">
+      <p>Pending Orders</p>
+      <h2 id="pending">0</h2>
+    </div>
+    <div class="card">
+      <p>Completed Orders</p>
+      <h2 id="completed">0</h2>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2>Create Laundry Order</h2>
+    <form id="orderForm">
+      <input id="customer" placeholder="Customer name" required>
+      <input id="address" placeholder="Customer address" required>
+
+      <select id="service">
+        <option>Normal Laundry</option>
+        <option>Dry Cleaning</option>
+      </select>
+
+      <input id="items" type="number" min="1"
+             placeholder="Number of items" required>
+
+      <button type="submit">Create Order</button>
+    </form>
+  </section>
+
+  <section class="card" style="margin-top:25px">
+    <h2>Order Tracking</h2>
+    <div id="orders">No orders created yet.</div>
+  </section>
+</main>
+
+<footer>
+  Laundry Operations Management System | Project Demo
+</footer>
+
+<script>
+let orders = [];
+
+document.getElementById("orderForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const order = {
+    id: Date.now().toString().slice(-6),
+    customer: document.getElementById("customer").value.trim(),
+    address: document.getElementById("address").value.trim(),
+    service: document.getElementById("service").value,
+    items: Number(document.getElementById("items").value),
+    status: "Pending"
+  };
+
+  orders.push(order);
+  renderOrders();
+  this.reset();
+});
+
+function renderOrders() {
+  document.getElementById("total").textContent = orders.length;
+  document.getElementById("pending").textContent =
+    orders.filter(o => o.status === "Pending").length;
+  document.getElementById("completed").textContent =
+    orders.filter(o => o.status === "Completed").length;
+
+  const container = document.getElementById("orders");
+  container.replaceChildren();
+
+  if (orders.length === 0) {
+    container.textContent = "No orders created yet.";
+    return;
+  }
+
+  orders.slice().reverse().forEach(order => {
+    const item = document.createElement("div");
+    item.className = "order";
+
+    const details = document.createElement("p");
+    details.textContent = `Order #${order.id} | ${order.customer} | ${order.service} | ${order.items} items`;
+
+    const address = document.createElement("p");
+    address.textContent = `Address: ${order.address}`;
+
+    const status = document.createElement("p");
+    status.className = "status";
+    status.textContent = `Status: ${order.status}`;
+
+    const button = document.createElement("button");
+    button.textContent = "Mark as Completed";
+    button.type = "button";
+    button.addEventListener("click", () => {
+      order.status = "Completed";
+      renderOrders();
+    });
+
+    item.append(details, address, status, button);
+    container.appendChild(item);
+  });
+}
+
+renderOrders();
+</script>
+
+</body>
+</html>
